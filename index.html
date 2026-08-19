@@ -408,12 +408,16 @@
             { logger: m => console.log(m) }
         ).then(({ data: { text } }) => {
             statusMsg.style.display = "none";
-            const cleanText = text.replace(/\s+/g, '');
+            // 濾除掉大部分常見的空白、特殊符號與英文雜訊，保留中文字
+            const cleanText = text.replace(/[a-zA-Z0-9\s\-_.,()]/g, '');
             
             let matched = [];
             data.forEach(row => {
-                if (cleanText.includes(row[0])) {
-                    if (!matched.some(m => m[0] === row[0])) {
+                const name = row[0];
+                // 1. 完全符合姓名
+                // 2. 如果名字兩個字以上，只要拍到其中關鍵字也算（避免單字辨識失誤）
+                if (cleanText.includes(name) || (name.length >= 2 && cleanText.includes(name[1]))) {
+                    if (!matched.some(m => m[0] === name)) {
                         matched.push(row);
                     }
                 }
@@ -424,8 +428,10 @@
                 document.getElementById("searchInput").value = matched[0][0];
                 alert(`🎯 成功辨識並找到：${matched[0][0]} (${matched[0][2]} / ${matched[0][1]})`);
             } else {
-                alert(`📷 圖片文字辨識結果：\n"${text.trim()}\n\n未直接找到完全相符的同事姓名，已將文字列出，您可手動微調搜尋。`);
-                document.getElementById("searchInput").value = text.trim().substring(0, 4);
+                // 如果沒有精準對應，把抓到的文字顯示在前台搜尋框讓使用者看
+                const rawSnippet = text.replace(/\s+/g, '').substring(0, 4);
+                alert(`📷 辨識結果未直接命中完整姓名。\n\nAI 讀到的文字片段：\n"${text.trim().substring(0, 30)}..."\n\n已嘗試代入搜尋，您也可以手動輸入姓名。`);
+                document.getElementById("searchInput").value = rawSnippet;
                 filterTable();
             }
         }).catch(err => {
