@@ -1,447 +1,153 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>7、8、9樓包裹完整查詢系統</title>
-    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-    <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: #f4f6f9;
-            margin: 0;
-            padding: 15px;
-        }
-        .container {
-            max-width: 650px;
-            margin: 0 auto;
-            background: #ffffff;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-        h2 {
-            color: #333;
-            text-align: center;
-            font-size: 20px;
-            margin-bottom: 20px;
-        }
-        .cam-box {
-            background: #e8f4fd;
-            border: 2px dashed #4a90e2;
-            padding: 15px;
-            border-radius: 8px;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .cam-btn {
-            background-color: #4a90e2;
-            color: white;
-            border: none;
-            padding: 14px 24px;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-            display: inline-block;
-        }
-        .cam-btn:active {
-            background-color: #357abd;
-        }
-        #statusMsg {
-            margin-top: 10px;
-            font-weight: bold;
-            color: #e67e22;
-            font-size: 14px;
-            display: none;
-        }
-        .search-box {
-            margin-bottom: 15px;
-        }
-        input[type="text"] {
-            width: 100%;
-            padding: 12px 15px;
-            font-size: 16px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            box-sizing: border-box;
-            outline: none;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-        }
-        th, td {
-            padding: 10px 12px;
-            text-align: left;
-            border-bottom: 1px solid #eee;
-            font-size: 15px;
-        }
-        th {
-            background-color: #f8f9fa;
-            color: #333;
-        }
-        tr:hover {
-            background-color: #f1f7ff;
-        }
-        .badge {
-            background-color: #e1ecf4;
-            color: #39739d;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 13px;
-        }
-        .floor-badge {
-            background-color: #eef9e8;
-            color: #2b7a0b;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 13px;
-            font-weight: bold;
-        }
-    </style>
-</head>
-<body>
-
-<div class="container">
-    <h2>📦 7、8、9樓包裹照相自動查詢系統</h2>
-    
-    <div class="cam-box">
-        <p style="margin: 0 0 10px 0; color: #555; font-size: 14px;">點擊拍照或選取包裹照片，系統會自動辨識並列出名字：</p>
-        <button class="cam-btn" onclick="triggerCamera()">📸 拍照 / 選擇包裹照片</button>
-        <input type="file" id="realFileinput" accept="image/*" style="display:none;" onchange="processImage(event)">
-        <div id="statusMsg">🔍 正在進行 AI 光學字體辨識，請稍候...</div>
-    </div>
-
-    <div class="search-box">
-        <input type="text" id="searchInput" placeholder="手動輸入姓名、部門或樓層(例: 8樓)搜尋..." onkeyup="filterTable()">
-    </div>
-    
-    <table id="employeeTable">
-        <thead>
-            <tr>
-                <th>姓名</th>
-                <th>部門 / 中心</th>
-                <th>樓層</th>
-                <th>分機</th>
-            </tr>
-        </thead>
-        <tbody id="tableBody">
-        </tbody>
-    </table>
-</div>
-
+<html lang="zh-Hant"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>A1 戶型・北歐簡約 3D 設計</title>
+<style>
+:root{--bg:#eef0f2;--fg:#2b2f33;--card:rgba(255,255,255,.92);--bd:#d3d8dc;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1e2225;--fg:#e8eaec;--card:rgba(40,45,49,.92);--bd:#3b4247}}
+:root[data-theme="dark"]{--bg:#1e2225;--fg:#e8eaec;--card:rgba(40,45,49,.92);--bd:#3b4247}
+html,body{height:100%;margin:0}
+body{position:relative;background:var(--bg);color:var(--fg);font-family:-apple-system,"PingFang TC","Noto Sans TC",sans-serif;overflow:hidden}
+#c{display:block;width:100%;height:100%;touch-action:none}
+#tags{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+.tag{position:absolute;transform:translate(-50%,-50%);background:#161616;color:#fff;padding:4px 10px;border-radius:8px;font-size:13px;white-space:nowrap}
+.top{position:absolute;left:12px;right:12px;top:10px;background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:8px 12px;font-size:13px;line-height:1.4;pointer-events:none}
+.top b{font-size:15px}
+.bar{position:absolute;left:12px;right:12px;bottom:12px;display:flex;gap:8px}
+.bar button{flex:1;padding:11px 4px;font-size:14px;color:var(--fg);background:var(--card);border:1px solid var(--bd);border-radius:10px}
+.bar button.on{outline:2px solid #7fa38a}
+</style></head><body>
+<canvas id="c"></canvas><div id="tags"></div>
+<div class="top"><b>A1 戶型・北歐簡約</b><br>3房2衛・30.87坪（示意）｜單指旋轉，雙指縮放</div>
+<div class="bar">
+<button id="b1">俯視</button><button id="b2">斜視</button><button id="b3" class="on">矮牆</button><button id="b4" class="on">標籤</button>
+<button id="b5" class="on">旋轉</button></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
-    const data = [
-        // ---------------- 7樓資料 ----------------
-        ["林群盛", "總經理辦公室", "7樓", "1110"], ["闕源龍", "董事長辦公室", "7樓", "NA"],
-        ["葉佳齡", "人事管理部", "7樓", "1112"], ["張皓婷", "人事管理部", "7樓", "1235"],
-        ["黃雯琦", "人事管理部", "7樓", "1270"], ["紀伃庭", "人事管理部", "7樓", "2519"],
-        ["吳怡萱", "人事管理部", "7樓", "2518"], ["周芸麗", "人事管理部", "7樓", "2592"],
-        ["吳承霖", "人事管理部", "7樓", "1162"], ["黃美雲", "人事管理部", "7樓", "1221"],
-        ["雷茜摁", "人事管理部", "7樓", "1816"], ["羅云秀", "人事管理部", "7樓", "NA"],
-        ["楊謦維", "人事管理部", "7樓", "1020"], ["羅愛淇", "人事管理部", "7樓", "1079"],
-        ["廖芳玉", "經管中心", "7樓", "6820"], ["馬香凝", "經管中心", "7樓", "2538"],
-        ["吳芳瑜", "經管中心", "7樓", "1295"], ["陳家宜", "經管中心", "7樓", "1889"],
-        ["黃學平", "經管中心", "7樓", "1084"], ["吳建輝", "經管中心", "7樓", "1041"],
-        ["3528", "經管中心", "7樓", "3528"], ["陳天智", "經管中心", "7樓", "1870"],
-        ["周曉芸", "經管中心", "7樓", "1950"], ["盧瑞鵬", "經管中心 (經理)", "7樓", "1251"],
-        ["李志宏", "經管中心", "7樓", "1140"], ["周世傑", "經管中心", "7樓", "1505"],
-        ["范傑龍", "經管中心", "7樓", "1080"], ["林億鑫", "經管中心", "7樓", "2701"],
-        ["陳信嘉", "經管中心", "7樓", "1083"], ["黃貴琳", "經管中心", "7樓", "1609"],
-        ["劉孟慧", "經管中心", "7樓", "1607"], ["楊明杰", "經管中心", "7樓", "1726"],
-        ["許嘉麟", "經管中心", "7樓", "1087"], ["江序芬", "經管中心 (經理)", "7樓", "1606"],
-        ["陶世遐", "經管中心", "7樓", "1222"], ["陳安琪", "經管中心", "7樓", "1931"],
-        ["許哲軒", "經管中心", "7樓", "1892"], ["徐朝亭", "經管中心", "7樓", "1183"],
-        ["許哲與", "經管中心", "7樓", "1231"], ["楊文碩", "經管中心", "7樓", "1891"],
-        ["陶幼林", "經管中心", "7樓", "1831"], ["林彥廷", "經管中心", "7樓", "1201"],
-        ["陳信昌", "經管中心 (經理)", "7樓", "1153"], ["林程佳", "法務諮詢課", "7樓", "1272"],
-        ["陳囿臻", "法務諮詢課", "7樓", "1267"], ["林哲輝", "法務諮詢課", "7樓", "1724"],
-        ["鄭弘祥", "法務諮詢課", "7樓", "1356"], ["陳弘恩", "法務諮詢課", "7樓", "1086"],
-        ["何建璋", "系統規劃部", "7樓", "6006"], ["施丞恩", "系統規劃部", "7樓", "1019"],
-        ["盧宗楷", "系統規劃部", "7樓", "1155"], ["張詔瑄", "系統規劃部", "7樓", "1890"],
-        ["杜佳貞", "系統規劃部", "7樓", "1948"], ["張永叡", "系統規劃部", "7樓", "1951"],
-        ["高嘉鴻", "系統規劃部", "7樓", "1089"], ["林佳均", "系統規劃部", "7樓", "1155"],
-        ["邱景星", "系統規劃部", "7樓", "1608"], ["陳韋帆", "系統規劃部", "7樓", "2704"],
-        ["凃維謙", "系統規劃部", "7樓", "1094"], ["高翊庭", "營運開發部", "7樓", "1090"],
-        ["曾翊凱", "營運開發部", "7樓", "1093"], ["張榮輝", "營運開發部", "7樓", "1091"],
-        ["林均亮", "營運開發部", "7樓", "1263"], ["林正偉", "營運開發部", "7樓", "2700"],
-        ["余欣怡", "營運開發部", "7樓", "2667"], ["廖逸詩", "營運開發部 (經理)", "7樓", "2695"],
-        ["翁蓓茹", "營運開發部", "7樓", "1953"], ["陳怡芳", "營運開發部", "7樓", "1182"],
-        ["許景崴", "營運開發部", "7樓", "2703"], ["鐘琬瑩", "營運開發部", "7樓", "2694"],
-        ["李雨澄", "營運開發部", "7樓", "6827"], ["陳政宏", "財務倉庫", "7樓", "1217"],
-        ["張哲維", "財務倉庫", "7樓", "1624"], ["姜伯勲", "財務倉庫", "7樓", "2702"],
-        ["郭庭嘉", "財務倉庫", "7樓", "2697"], ["余永從", "財務倉庫", "7樓", "1044"],
-        ["蘇勇章", "財務倉庫", "7樓", "1249"], ["温家宏", "財務倉庫", "7樓", "2698"],
-        ["彭俞山", "財務倉庫", "7樓", "2696"], ["薛芳宜", "財務倉庫", "7樓", "1899"],
-        ["陳志彥", "財務倉庫", "7樓", "1274"], ["呂彥明", "財務倉庫", "7樓", "1264"],
-        ["葉辰雲", "財務倉庫", "7樓", "1884"], ["陳裕德", "風管中心 (資深經理)", "7樓", "1243"],
-        ["林炘燕", "財管中心 (資深協理)", "7樓", "1360"], ["馬其正", "資訊中心 (協理)", "7樓", "1603"],
-        ["蘇冠華", "稽核室 (副理)", "7樓", "1058"], ["解睿凱", "經管中心", "7樓", "3500"],
-        ["黃季婷", "經管中心", "7樓", "1703"], ["林緯俊", "經管中心", "7樓", "1742"],
-        ["吳建輝", "經管中心", "7樓", "1856"], ["王信閔", "資深副理", "7樓", "2587"],
-        ["蔡文寧", "資訊中心", "7樓", "1213"], ["沈咨沅", "資訊中心", "7樓", "1040"],
-        ["劉雅芬", "資訊中心", "7樓", "2588"], ["林崇仁", "資訊中心", "7樓", "6717"],
-        ["施冠宇", "資訊中心", "7樓", "1252"], ["李沛諭", "資訊中心", "7樓", "1215"],
-        ["胡純怡", "財管一部", "7樓", "1712"], ["邢芳菱", "財管一部", "7樓", "1247"],
-        ["林梅薏", "財管一部", "7樓", "1292"], ["黃佩芬", "財管一部", "7樓", "1721"],
-        ["呂佳燕", "財管一部", "7樓", "1073"], ["林雪琴", "財管一部", "7樓", "2594"],
-        ["歐陽嘉玲", "財管一部", "7樓", "1709"], ["鄭琬諭", "財管一部", "7樓", "1702"],
-        ["杜昀容", "財管一部", "7樓", "1253"], ["謝傳賢", "資訊中心", "7樓", "6721"],
-        ["戴意諠", "資訊中心", "7樓", "1836"], ["王昭惠", "資訊中心", "7樓", "1834"],
-        ["許雪昭", "資訊中心", "7樓", "1766"], ["林靜怡", "資訊中心", "7樓", "1729"],
-        ["李佳珍", "資訊中心", "7樓", "1300"], ["林家慎", "資訊中心 (資深經理)", "7樓", "1717"],
-        ["李岳霖", "資訊中心", "7樓", "1716"], ["林意慈", "資訊中心", "7樓", "1736"],
-        ["陳壯宇", "資訊中心", "7樓", "1293"], ["廖婉庭", "資訊中心", "7樓", "1701"],
-        ["朱劭恩", "資訊中心", "7樓", "1872"], ["劉家徵", "資訊中心", "7樓", "6820"],
-        ["謝瑞珍", "資訊中心", "7樓", "2595"], ["鄧美雲", "資訊中心", "7樓", "2537"],
-        ["鄭乃禎", "資訊中心", "7樓", "2688"], ["周淑梅", "財管二部 (經理)", "7樓", "2535"],
-        ["張菱娜", "財管二部", "7樓", "2538"], ["劉慧如", "財管二部", "7樓", "2030"],
-        ["蔡睿倫", "財管二部", "7樓", "6868"], ["莊秀淇", "財管二部", "7樓", "6816"],
-        ["劉櫻慧", "財管二部", "7樓", "2536"], ["張巧怡", "財管二部", "7樓", "6708"],
-        ["馬香凝", "財管二部", "7樓", "6866"], ["廖慧娟", "事業營運發展部", "7樓", "1095"],
-        ["陳家宜", "事業營運發展部", "7樓", "1889"], ["黃學平", "事業營運發展部", "7樓", "1041"],
-        ["周世澂", "事業營運發展部", "7樓", "1265"], ["范傑龍", "事業營運發展部", "7樓", "1083"],
-        ["林億鑫", "事業營運發展部", "7樓", "2693"], ["陳信嘉", "事業營運發展部", "7樓", "2699"],
-        ["陳泳蓁", "事業營運發展部", "7樓", "2624"], ["黃戎歆", "事業營運發展部", "7樓", "1023"],
-        ["黃沛綺", "事業營運發展部", "7樓", "1161"], ["蔡銘儒", "事業營運發展部", "7樓", "1124"],
-        ["侯欣儀", "事業營運發展部", "7樓", "1758"], ["蔡佳臻", "事業營運發展部", "7樓", "1248"],
-        ["姚昱亘", "事業營運發展部", "7樓", "1842"], ["張家笙", "經營企劃部 (經理)", "7樓", "1170"],
-        ["楊紫瑄", "數位轉型推進課", "7樓", "1043"], ["邱炫蓁", "數位轉型推進課", "7樓", "1760"],
-        ["吳翊萱", "數位轉型推進課", "7樓", "1843"], ["侯雅仙", "數位轉型推進課", "7樓", "1207"],
-        ["黃宣龍", "數位轉型推進課", "7樓", "1032"], ["黃于亭", "數位轉型推進課", "7樓", "1065"],
-        ["林辰駿", "數位轉型推進課", "7樓", "1085"], ["王子豪", "數位轉型推進課", "7樓", "2649"],
-        ["張睿", "數位轉型推進課", "7樓", "1751"], ["張育瑄", "數位轉型推進課", "7樓", "1070"],
-        ["夏筱暄", "數位轉型推進課", "7樓", "1750"], ["陳怡晴", "數位轉型推進課", "7樓", "1638"],
-        ["陳子雄", "整合行銷部", "7樓", "1762"], ["李慈語", "整合行銷部", "7樓", "1749"],
-        ["盧俐妤", "整合行銷部", "7樓", "1753"], ["陳怡申", "整合行銷部", "7樓", "1754"],
-        ["林軍策", "整合行銷部", "7樓", "1761"], ["蕭雪君", "整合行銷部 (經理)", "7樓", "1029"],
-        ["莊宸熙", "整合行銷部", "7樓", "1209"], ["趙威", "整合行銷部", "7樓", "1893"],
-        ["曾俊銘", "整合行銷部", "7樓", "1069"], ["劉韋伶", "整合行銷部", "7樓", "1640"],
-        ["邱彥齊", "服務開發部", "7樓", "1892"], ["王璿堯", "服務開發部", "7樓", "1183"],
-        ["許嘉麟", "服務開發部", "7樓", "1231"], ["藍若瑄", "服務開發部", "7樓", "1847"],
-        ["陳怡勳", "服務開發部", "7樓", "1945"], ["程柏凱", "服務開發部", "7樓", "1831"],
-        ["許一凡", "服務開發部", "7樓", "1201"], ["陳信昌", "服務開發部 (經理)", "7樓", "1153"],
-        ["李采庭", "稽核室", "7樓", "2591"], ["丁曉雪", "稽核室", "7樓", "1728"],
-
-        // ---------------- 8樓資料 ----------------
-        ["呂學臻", "汽車租賃事業群 (副總)", "8樓", "1111"], ["黃莉雅", "汽車租賃事業群", "8樓", "1039"],
-        ["黃淑娟", "汽車租賃事業群", "8樓", "1156"], ["劉美珠", "汽車租賃事業群", "8樓", "1106"],
-        ["陳雅芳", "汽車租賃事業群", "8樓", "1157"], ["游慧玲", "汽車租賃事業群", "8樓", "1113"],
-        ["陳淑華", "汽車租賃事業群", "8樓", "1036"], ["張惠芬", "汽車租賃事業群", "8樓", "1114"],
-        ["楊雅婷", "汽車租賃事業群", "8樓", "1037"], ["陳冠廷", "汽車租賃事業群", "8樓", "1268"],
-        ["林志豪", "汽車租賃事業群", "8樓", "1109"], ["張家豪", "汽車租賃事業群", "8樓", "1038"],
-        ["王雅慧", "汽車租賃事業群", "8樓", "1108"], ["李佳蓉", "汽車租賃事業群", "8樓", "1115"],
-        ["林淑芬", "汽車租賃事業群", "8樓", "1060"], ["陳美玲", "汽車租賃事業群", "8樓", "1116"],
-        ["黃建智", "汽車租賃事業群", "8樓", "1117"], ["林詩涵", "汽車租賃事業群", "8樓", "1062"],
-        ["張維中", "汽車租賃事業群", "8樓", "1118"], ["吳佩珊", "汽車租賃事業群", "8樓", "1064"],
-        ["陳建宏", "汽車租賃事業群", "8樓", "1119"], ["李明憲", "汽車租賃事業群", "8樓", "1066"],
-        ["王淑華", "汽車租賃事業群", "8樓", "1121"], ["林志明", "汽車租賃事業群", "8樓", "1068"],
-        ["陳淑芬", "汽車租賃事業群", "8樓", "1122"], ["黃雅婷", "汽車租賃事業群", "8樓", "1071"],
-        ["張志豪", "汽車租賃事業群", "8樓", "1123"], ["李雅婷", "汽車租賃事業群", "8樓", "1072"],
-        ["陳冠宇", "汽車租賃事業群", "8樓", "1125"], ["林美玲", "汽車租賃事業群", "8樓", "1074"],
-        ["張雅婷", "汽車租賃事業群", "8樓", "1126"], ["黃志豪", "汽車租賃事業群", "8樓", "1075"],
-        ["陳雅婷", "汽車租賃事業群", "8樓", "1127"], ["林建宏", "汽車租賃事業群", "8樓", "1076"],
-        ["張淑芬", "汽車租賃事業群", "8樓", "1128"], ["李明哲", "汽車租賃事業群", "8樓", "1078"],
-        ["王志豪", "汽車租賃事業群", "8樓", "1129"], ["林雅婷", "汽車租賃事業群", "8樓", "1081"],
-        ["陳建宏", "汽車租賃事業群", "8樓", "1131"], ["張美玲", "汽車租賃事業群", "8樓", "1082"],
-        ["黃冠宇", "汽車租賃事業群", "8樓", "1132"], ["林志明", "汽車租賃事業群", "8樓", "1088"],
-        ["陳淑華", "汽車租賃事業群", "8樓", "1133"], ["李雅芳", "汽車租賃事業群", "8樓", "1092"],
-        ["張雅芳", "汽車租賃事業群", "8樓", "1134"], ["黃美玲", "汽車租賃事業群", "8樓", "1096"],
-        ["陳志豪", "汽車租賃事業群", "8樓", "1135"], ["林建銘", "汽車租賃事業群", "8樓", "1097"],
-        ["張淑華", "汽車租賃事業群", "8樓", "1136"], ["李明華", "汽車租賃事業群", "8樓", "1098"],
-        ["王雅芳", "汽車租賃事業群", "8樓", "1137"], ["林美華", "汽車租賃事業群", "8樓", "1099"],
-        ["陳冠宇", "汽車租賃事業群", "8樓", "1138"], ["張志明", "汽車租賃事業群", "8樓", "1101"],
-        ["黃雅芳", "汽車租賃事業群", "8樓", "1139"], ["林建華", "汽車租賃事業群", "8樓", "1102"],
-        ["陳雅芳", "汽車租賃事業群", "8樓", "1141"], ["李明輝", "汽車租賃事業群", "8樓", "1103"],
-        ["張美華", "汽車租賃事業群", "8樓", "1142"], ["黃志明", "汽車租賃事業群", "8樓", "1104"],
-        ["陳淑芳", "汽車租賃事業群", "8樓", "1143"], ["林建文", "汽車租賃事業群", "8樓", "1105"],
-        ["張雅芳", "汽車租賃事業群", "8樓", "1144"], ["李明芳", "汽車租賃事業群", "8樓", "1107"],
-        ["黃雅芳", "汽車租賃事業群", "8樓", "1145"], ["林美芳", "汽車租賃事業群", "8樓", "1130"],
-        ["陳雅芳", "汽車租賃事業群", "8樓", "1146"], ["張美芳", "汽車租賃事業群", "8樓", "1147"],
-        ["黃志芳", "汽車租賃事業群", "8樓", "1148"], ["林建平", "汽車租賃事業群", "8樓", "1149"],
-        ["張雅芳", "汽車租賃事業群", "8樓", "1151"], ["李明平", "汽車租賃事業群", "8樓", "1152"],
-        ["黃雅芳", "汽車租賃事業群", "8樓", "1154"], ["林美平", "汽車租賃事業群", "8樓", "1158"],
-
-        // ---------------- 9樓資料 ----------------
-        ["陳國強", "主管", "9樓", "NA"],
-        ["林偉廷", "行控", "9樓", "1826"],
-        ["黃千慈", "行控中心", "9樓", "NA"],
-        ["范舒涵", "行控中心", "9樓", "NA"],
-        ["江秉釗", "自駕北區業務部 (經理)", "9樓", "1190"],
-        ["黃鼎彬", "北區停車場開發暨營運開拓課", "9樓", "1808"],
-        ["陳黃鴻", "北區停車場開發暨營運開拓課", "9樓", "1814"],
-        ["許姿儀", "北區停車場開發暨營運開拓課", "9樓", "1047"],
-        ["黃苡綺", "北區停車場開發暨營運開拓課", "9樓", "1057"],
-        ["陳昭莊", "北區停車場開發暨營運開拓課", "9樓", "1757"],
-        ["黃尊鈺", "北區停車場開發暨營運開拓課", "9樓", "1833"],
-        ["鄭香伶", "北區停車場開發暨營運開拓課", "9樓", "1699"],
-        ["李嘉絨", "北區停車場開發暨營運開拓課", "9樓", "1756"],
-        ["程郁翔", "北區停車場開發暨營運開拓課", "9樓", "1056"],
-        ["黃揚鈞", "北區停車場開發暨營運開拓課", "9樓", "1759"],
-        ["吳俊璋", "自駕南區業務部 (經理)", "9樓", "1830"],
-        ["羅浩翔", "自駕南區業務部", "9樓", "1935"],
-        ["王俊雄", "自駕南區業務部", "9樓", "1180"],
-        ["鄧妍庭", "自駕南區業務部", "9樓", "1229"],
-        ["邱暐翔", "自駕南區業務部", "9樓", "1851"],
-        ["黃楚芩", "自駕南區業務部", "9樓", "1052"],
-        ["陳光俊", "自駕南區業務部", "9樓", "1861"],
-        ["朱家瑩", "自駕南區業務部", "9樓", "1605"],
-        ["陳坤毅", "自駕南區業務部", "9樓", "1245"],
-        ["蘇正升", "自駕南區業務部", "9樓", "1238"],
-        ["石涓孜", "自駕南區業務部", "9樓", "1053"],
-        ["林婉榛", "自駕營管課 / 營企課", "9樓", "1846"],
-        ["楊雅晴", "自駕營管課 / 營企課", "9樓", "3757"],
-        ["林君穎", "自駕營管課 / 營企課", "9樓", "1242"],
-        ["李瀚宇", "自駕營管課 / 營企課", "9樓", "1125"],
-        ["連紀婷", "自駕營管課 / 營企課", "9樓", "2576"],
-        ["陳妍臻", "出行行銷企劃部 (副理)", "9樓", "1637"],
-        ["顏惠萍", "出行行銷企劃部", "9樓", "1656"],
-        ["劉亭", "出行行銷企劃部", "9樓", "1874"],
-        ["李博呈", "出行行銷企劃部", "9樓", "1919"],
-        ["張玉瓊", "出行行銷企劃部", "9樓", "1805"],
-        ["許翊恩", "出行行銷企劃部", "9樓", "1939"],
-        ["呂曜廷", "出行行銷企劃部", "9樓", "1244"],
-        ["薛志耀", "出行行銷企劃部", "9樓", "1919"],
-        ["王柏棠", "出行服務事業群 (資協)", "9樓", "3105"],
-        ["傅若梅", "駕駛營業部 (資協)", "9樓", "2501"],
-        ["莊曜浚", "駕駛營業課", "9樓", "1230"],
-        ["張志平", "駕駛營業課", "9樓", "1877"],
-        ["周志剛", "駕駛營業課", "9樓", "1290"],
-        ["郭志煌", "駕駛營業課", "9樓", "1895"],
-        ["朱晉緯", "駕駛營業課", "9樓", "1936"],
-        ["楊雅云", "駕駛營業課", "9樓", "1061"],
-        ["林彥伶", "營業車租賃課", "9樓", "1289"],
-        ["卓庭筑", "營業車租賃課", "9樓", "1246"],
-        ["廖心彤", "營業車租賃課", "9樓", "1914"],
-        ["鄭怡婷", "駕駛營業課", "9樓", "1015"],
-        ["陳宗慶", "駕駛營業課 (副理)", "9樓", "1602"],
-        ["林浩瑋", "專車營業課", "9樓", "1804"],
-        ["傅湘怡", "專車營業課", "9樓", "1837"],
-        ["王文儀", "專車營業課", "9樓", "1838"],
-        ["徐以倫", "專車營業課", "9樓", "1100"],
-        ["劉夢薇", "專車營業課", "9樓", "1063"],
-        ["林宏懋", "專車營業課 (副理)", "9樓", "1027"],
-        ["胡依雯", "債信管理部 (資深經理)", "9樓", "1296"],
-        ["連程顥", "債權管理課 / 法務管理課 / 顧關課 / 授管課", "9樓", "1257"],
-        ["賴宏偉", "債權管理課 / 法務管理課 / 顧關課 / 授管課", "9樓", "1941"],
-        ["黃士豪", "債權管理課 / 法務管理課 / 顧關課 / 授管課", "9樓", "1236"],
-        ["林芳伃", "債權管理課 / 法務管理課 / 顧關課 / 授管課", "9樓", "1272"],
-        ["陳雯菁", "債權管理課 / 法務管理課 / 顧關課 / 授管課", "9樓", "1012"],
-        ["周淑君", "債信管理部", "9樓", "1224"],
-        ["蕭亦筌", "債信管理部", "9樓", "3502"],
-        ["朱家霈", "債信管理部", "9樓", "3519"],
-        ["陳宛妤", "充電營運課", "9樓", "3503"],
-        ["龔筱祺", "充電營運課", "9樓", "1611"],
-        ["蘇庭慧", "充電營業部", "9樓", "1211"],
-        ["梁雅婷", "充電營業部", "9樓", "1350"],
-        ["黃國晏", "充電營業部", "9樓", "1267"],
-        ["葉耿良", "充電營業部", "9樓", "1828"],
-        ["鍾慕樺", "充電營業部", "9樓", "1218"],
-        ["陳柏成", "充電業務課 (經理)", "9樓", "3515"],
-        ["王莉雲", "充電業務課", "9樓", "3231"],
-        ["李宜芸", "充電業務課", "9樓", "3513"],
-        ["曾辰萱", "充電業務課", "9樓", "3302"],
-        ["林美惠", "充電業務課", "9樓", "6536"],
-        ["黃信嘉", "充電業務課", "9樓", "1707"],
-        ["藍珮禎", "充電業務課", "9樓", "1832"],
-        ["申皓仁", "充電業務課", "9樓", "1718"],
-        ["廖偉凱", "充電業務課", "9樓", "1724"],
-        ["葛任詳", "充電服務課", "9樓", "1034"],
-        ["胡順仁", "充電服務課", "9樓", "1719"],
-        ["蔡耀霆", "充電服務課", "9樓", "1720"],
-        ["傅証", "充電服務課", "9樓", "1722"],
-        ["陳志豪", "充電服務課", "9樓", "3703"],
-        ["高慧珊", "充電服務課", "9樓", "3518"],
-        ["沈輝龍", "充電服務課", "9樓", "3301"],
-        ["郭岱衡", "充電服務課", "9樓", "3305"],
-        ["翁玉潔", "充電服務課", "9樓", "3704"],
-        ["高嘉鴻", "充電服務課", "9樓", "3308"]
-    ];
-
-    function renderTable(list) {
-        const tbody = document.getElementById("tableBody");
-        tbody.innerHTML = "";
-        if (list.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#888;">找不到符合的資料</td></tr>`;
-            return;
-        }
-        list.forEach(row => {
-            const tr = document.createElement("tr");
-            tr.innerHTML = `<td><strong>${row[0]}</strong></td><td><span class="badge">${row[1]}</span></td><td><span class="floor-badge">${row[2]}</span></td><td>${row[3]}</td>`;
-            tbody.appendChild(tr);
-        });
-    }
-
-    function filterTable() {
-        const keyword = document.getElementById("searchInput").value.toLowerCase().trim();
-        if (!keyword) {
-            renderTable(data);
-            return;
-        }
-        const filtered = data.filter(row => 
-            row[0].toLowerCase().includes(keyword) || 
-            row[1].toLowerCase().includes(keyword) || 
-            row[2].toLowerCase().includes(keyword) ||
-            row[3].toLowerCase().includes(keyword)
-        );
-        renderTable(filtered);
-    }
-
-    function triggerCamera() {
-        document.getElementById("realFileinput").click();
-    }
-
-    function processImage(event) {
-        const file = event.target.files[0];
-        if (!file) return;
-
-        const statusMsg = document.getElementById("statusMsg");
-        statusMsg.style.display = "block";
-        statusMsg.innerText = "🔍 正在進行 AI 光學字體辨識，請稍候...";
-
-        Tesseract.recognize(
-            file,
-            'chi_tra+eng',
-            { logger: m => console.log(m) }
-        ).then(({ data: { text } }) => {
-            statusMsg.style.display = "none";
-            // 濾除掉大部分常見的空白、特殊符號與英文雜訊，保留中文字
-            const cleanText = text.replace(/[a-zA-Z0-9\s\-_.,()]/g, '');
-            
-            let matched = [];
-            data.forEach(row => {
-                const name = row[0];
-                // 1. 完全符合姓名
-                // 2. 如果名字兩個字以上，只要拍到其中關鍵字也算（避免單字辨識失誤）
-                if (cleanText.includes(name) || (name.length >= 2 && cleanText.includes(name[1]))) {
-                    if (!matched.some(m => m[0] === name)) {
-                        matched.push(row);
-                    }
-                }
-            });
-
-            if (matched.length > 0) {
-                renderTable(matched);
-                document.getElementById("searchInput").value = matched[0][0];
-                alert(`🎯 成功辨識並找到：${matched[0][0]} (${matched[0][2]} / ${matched[0][1]})`);
-            } else {
-                // 如果沒有精準對應，把抓到的文字顯示在前台搜尋框讓使用者看
-                const rawSnippet = text.replace(/\s+/g, '').substring(0, 4);
-                alert(`📷 辨識結果未直接命中完整姓名。\n\nAI 讀到的文字片段：\n"${text.trim().substring(0, 30)}..."\n\n已嘗試代入搜尋，您也可以手動輸入姓名。`);
-                document.getElementById("searchInput").value = rawSnippet;
-                filterTable();
-            }
-        }).catch(err => {
-            statusMsg.style.display = "none";
-            alert("❌ 辨識發生錯誤，請重新拍照或直接手動輸入姓名搜尋。");
-        });
-    }
-
-    renderTable(data);
-</script>
-
-</body>
-</html>
+const WALL=0xffffff,FLOOR=0xebd8b4,OAK=0xc9a77c,WH=0xf7f6f3,GR=0xb4babe,SG=0x9db7a2,BK=0x2f3236,TILE=0xcfd5d8,BL=0xdfe6ea;
+const cv=document.getElementById('c');
+const r=new THREE.WebGLRenderer({canvas:cv,antialias:true});
+r.shadowMap.enabled=false;
+const sc=new THREE.Scene();
+const cam=new THREE.PerspectiveCamera(40,1,.1,200);
+sc.add(new THREE.HemisphereLight(0xffffff,0xd8d4cc,.65));
+const dl=new THREE.DirectionalLight(0xffffff,.5);dl.position.set(4,16,12);dl.castShadow=true;
+dl.shadow.mapSize.set(2048,2048);Object.assign(dl.shadow.camera,{left:-12,right:12,top:12,bottom:-12,far:50});sc.add(dl);
+const cache={};const OM=new THREE.MeshBasicMaterial({color:0x1c1c1c,side:THREE.BackSide}),LM=new THREE.LineBasicMaterial({color:0x1c1c1c});
+const M=c=>cache[c]||(cache[c]=new THREE.MeshStandardMaterial({color:c,roughness:.9}));
+const G=new THREE.Group();sc.add(G);
+function b(x,z,w,d,h,c,y=0){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),M(c));m.position.set(x+w/2,y+h/2,z+d/2);G.add(m);
+if(h>=.05&&Math.min(w,d)>=.04){m.add(new THREE.LineSegments(new THREE.EdgesGeometry(m.geometry),LM));const o=new THREE.Mesh(new THREE.BoxGeometry(w+.035,h+.035,d+.035),OM);o.position.copy(m.position);G.add(o)}return m}
+const walls=[];let WH_=.9;
+function wl(x1,z1,x2,z2,col=WALL){const t=.12,hz=z1===z2;const w=hz?x2-x1:t,d=hz?t:z2-z1;
+const m=new THREE.Mesh(new THREE.BoxGeometry(1,1,1),M(col));m.add(new THREE.LineSegments(new THREE.EdgesGeometry(m.geometry),LM));
+m.userData={cx:hz?(x1+x2)/2:x1,cz:hz?z1:(z1+z2)/2,w:hz?w+t:w,d:hz?d:d+t};G.add(m);const o=new THREE.Mesh(new THREE.BoxGeometry(1,1,1),OM);G.add(o);m.userData.o=o;walls.push(m)}
+function setH(h){WH_=h;walls.forEach(m=>{const u=m.userData;m.scale.set(u.w,h,u.d);m.position.set(u.cx,h/2,u.cz);if(u.o){u.o.scale.set(u.w+.05,h+.05,u.d+.05);u.o.position.set(u.cx,h/2,u.cz)}})}
+const gm=new THREE.MeshStandardMaterial({color:0xbfe3f2,transparent:true,opacity:.28,roughness:.2});
+function gl(x,z,w,d,h,y=0){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),gm);m.position.set(x+w/2,y+h/2,z+d/2);G.add(m)}
+const rkc=document.createElement('canvas');rkc.width=128;rkc.height=8;const rg=rkc.getContext('2d');for(let i=0;i<128;i+=8){rg.fillStyle='rgba(255,255,255,.85)';rg.fillRect(i,0,4,8);rg.fillStyle='rgba(190,206,212,.55)';rg.fillRect(i+4,0,4,8)}
+const rkt=new THREE.CanvasTexture(rkc);rkt.wrapS=rkt.wrapT=THREE.RepeatWrapping;rkt.repeat.set(4,1);
+const rm=new THREE.MeshStandardMaterial({color:0xeef2f3,transparent:true,opacity:.82,roughness:.9});
+function rgl(x,z,w,d,h,y=0){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),rm);m.position.set(x+w/2,y+h/2,z+d/2);G.add(m)}
+function plant(x,z,s=1){return;b(x-.12*s,z-.12*s,.24*s,.24*s,.3*s,WH);const l=new THREE.Mesh(new THREE.SphereGeometry(.28*s,12,10),M(0x6f9a74));l.position.set(x,.55*s,z);l.castShadow=true;G.add(l)}
+// floors
+function tex(draw,rx,ry){const k=document.createElement('canvas');k.width=k.height=512;draw(k.getContext('2d'));const t=new THREE.CanvasTexture(k);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(rx,ry);t.anisotropy=4;return t}
+const drawWood=g=>{for(let i=0;i<8;i++){const o=(i*97)%256;for(let k=-1;k<3;k++){const x=o+k*256;g.fillStyle='hsl(34,'+(42+(i*7+k*3+9)%9)+'%,'+(66+(i*5+k*11+7)%7)+'%)';g.fillRect(x,i*64,256,64);g.strokeStyle='rgba(110,80,45,.5)';g.lineWidth=2;g.strokeRect(x,i*64,256,64)}}};
+const drawTile=g=>{const c=['#b6bbbf','#adb3b7','#b2b7bb','#a9afb3'];for(let i=0;i<2;i++)for(let j=0;j<2;j++){g.fillStyle=c[i*2+j];g.fillRect(j*256,i*256,256,256);g.strokeStyle='rgba(60,65,70,.55)';g.lineWidth=4;g.strokeRect(j*256,i*256,256,256)}};
+const fl=new THREE.Mesh(new THREE.BoxGeometry(10,.04,6.9),new THREE.MeshStandardMaterial({map:tex(drawWood,10/1.2,6.9/1.2),roughness:.8}));fl.position.set(5,-.02,3.45);G.add(fl);
+const bf=new THREE.Mesh(new THREE.BoxGeometry(3.45,.02,2.8),new THREE.MeshStandardMaterial({map:tex(drawTile,3.45/1.2,2.8/1.2),roughness:.5}));bf.position.set(5.475,.01,1.4);G.add(bf);
+const fl2=new THREE.Mesh(new THREE.BoxGeometry(1.93,.04,4.1),new THREE.MeshStandardMaterial({map:tex(drawWood,1.93/1.2,4.1/1.2),roughness:.8}));fl2.position.set(9.035,-.02,-2.05);G.add(fl2);
+const ef=new THREE.Mesh(new THREE.BoxGeometry(1.93,.02,1.1),new THREE.MeshStandardMaterial({map:tex(drawTile,1.93/1.2,1.1/1.2),roughness:.5}));ef.position.set(9.035,.01,-3.55);G.add(ef);
+b(8.2,-4.16,1.2,.06,2.1,0x3a3d41);b(8.13,-4.18,.07,.14,2.15,OAK);b(9.4,-4.18,.07,.14,2.15,OAK);b(8.13,-4.18,1.34,.14,.07,OAK,2.15);b(9.1,-4.04,.15,.04,.04,0xc8c8c8,1.0);b(8.4,-3.7,.8,.5,.03,0x6b6f73,.02);
+b(9.6,-3.5,.4,7.4,2.1,WH);for(let i=1;i<6;i+=2)b(9.59,-3.45+i*1.23,.012,1.15,2.0,OAK,.05);b(9.1,-3.3,.5,.9,.45,OAK);
+const pm=new THREE.MeshStandardMaterial({map:tex(drawTile,1,1),roughness:.5});
+function tw(x1,z1,x2,z2){const hz=z1===z2;const m=new THREE.Mesh(new THREE.BoxGeometry(1,1,1),pm);m.add(new THREE.LineSegments(new THREE.EdgesGeometry(m.geometry),LM));m.userData={cx:(x1+x2)/2,cz:(z1+z2)/2,w:hz?x2-x1:.02,d:hz?.02:z2-z1};G.add(m);walls.push(m)}
+tw(3.81,.07,5.44,.07);tw(3.82,.06,3.82,1.6);tw(3.82,2.5,3.82,2.74);tw(3.81,2.73,5.44,2.73);tw(5.44,.06,5.44,2.74);
+tw(5.57,.07,7.13,.07);tw(5.56,.06,5.56,2.74);tw(7.14,.06,7.14,2.74);tw(5.57,2.73,6.4,2.73);b(5,6.9,3.8,1.9,.04,0xb9bfc2,-.04);
+// walls
+wl(0,0,8.07,0);wl(0,0,0,6.9);wl(10,-4.1,10,6.9);wl(8.07,-4.1,8.07,0);wl(8.07,-4.1,8.2,-4.1);wl(9.4,-4.1,10,-4.1);wl(0,6.9,5,6.9);wl(8.8,6.9,10,6.9);
+wl(0,2.8,2.7,2.8);wl(3.7,2.8,5.5,2.8,0xbcd0c0);wl(5.5,2.8,6.4,2.8);wl(7.1,2.8,7.2,2.8);
+wl(3.75,0,3.75,1.6,0xbcd0c0);wl(3.75,2.5,3.75,2.8,0xbcd0c0);wl(5.5,0,5.5,2.8);wl(7.2,0,7.2,2.8);
+wl(2.45,4,2.45,6.9);wl(2.5,4,3.1,4);wl(4.2,4,4.95,4);wl(4.95,4,4.95,6.9);
+setH(.9);
+// windows & balcony glass
+gl(-.01,.5,.14,1.9,1.3,.9);gl(-.01,4.4,.14,2,1.3,.9);gl(3,6.84,1.5,.14,1.3,.9);
+gl(5,6.88,3.8,.05,2.3);gl(5,8.78,3.8,.04,1.1);gl(5,6.9,.04,1.9,1.1);gl(8.76,6.9,.04,1.9,1.1);
+function toilet(x,z){b(x,z,.4,.2,.75,WH);const bw=new THREE.Mesh(new THREE.CylinderGeometry(.19,.16,.4,20),M(WH));bw.scale.z=1.35;bw.position.set(x+.2,.2,z+.45);G.add(bw);const o=new THREE.Mesh(bw.geometry,OM);o.scale.set(1.12,1.04,1.51);o.position.copy(bw.position);G.add(o);const ld=new THREE.Mesh(new THREE.CylinderGeometry(.17,.17,.03,20),M(0xe9e6e0));ld.scale.z=1.35;ld.position.set(x+.2,.42,z+.45);G.add(ld)}
+function openWard(x,z,w,d){const h=1.5,t=.04;
+b(x,z,t,d,h,OAK);b(x+w-t,z,t,d,h,OAK);b(x+w/2-t/2,z,t,d,h,OAK);b(x,z,w,d,t,OAK,h-t);b(x,z+d-.02,w,.02,h,0xefe6d6);
+const rc=[WH,GR,SG,0xd9c7a8,0xb8a89a,0xe6e1da];
+for(let i=0;i<6;i++)b(x+.09+i*.14,z+.08,.06,d-.2,.75,rc[i],.4);
+b(x+t,z+d/2-.01,w/2-t*1.5,.02,.02,BK,1.2);
+b(x+w/2+t/2,z,w/2-t*1.5,d,.4,OAK);b(x+w/2+.3,z-.02,.4,.02,.03,BK,.2);
+[.45,.8,1.15].forEach((y,i)=>{b(x+w/2+t/2,z,w/2-t*1.5,d,.03,OAK,y);b(x+w/2+.1,z+.08,.5,d-.2,.25,rc[i+1],y+.03)})}
+// master bedroom
+b(1.0,.1,1.5,2,.42,WH);b(.95,.04,1.6,.08,.9,OAK);b(1.0,.9,1.5,1.2,.5,SG,.0);b(1.1,.2,.5,.3,.12,WH,.42);b(1.9,.2,.5,.3,.12,WH,.42);
+b(.4,.1,.4,.4,.45,OAK);b(2.6,.1,.4,.4,.45,OAK);openWard(.1,2.15,2,.6);b(.6,.6,2.6,1.5,.02,0xe9e5dc);plant(3.4,.4,.9);
+// bedroom B
+b(.1,4.3,1.9,1.5,.42,WH);b(.05,4.25,.08,1.6,.9,OAK);b(.9,4.3,1.1,1.5,.5,GR);b(.15,4.45,.3,.5,.12,WH,.42);b(.15,5.2,.3,.5,.12,WH,.42);b(.1,3.7,.4,.4,.45,OAK);openWard(.1,5.95,2.2,.55);plant(2.1,3.2,.8);
+b(.5,3.1,1.6,1,.02,0xe9e5dc);
+// guest room C with desk
+b(2.55,4.5,.6,1.6,.05,OAK,.72);b(2.58,4.52,.04,.56,.72,OAK);b(2.58,5.54,.04,.56,.72,OAK);
+b(3.25,5.0,.45,.45,.45,BK);b(3.65,5.0,.05,.45,.45,BK,.45);b(2.7,4.7,.2,.2,.04,BK,.77);
+b(4.0,4.9,.9,1.9,.4,GR);b(4.0,6.7,.9,.1,.8,GR);b(4.1,6.35,.5,.3,.12,WH,.4);plant(4.65,4.4,.7);
+// bathrooms
+toilet(5.0,.1);b(3.85,.1,.8,.5,.8,WH);toilet(6.7,.1);b(5.55,.1,.8,.5,.8,WH);b(5.6,1.5,.78,1.22,.04,0xaab8bf);gl(5.56,1.4,.84,.04,1.6);gl(6.38,1.43,.04,1.31,1.6);b(6.36,1.4,.06,.06,1.6,BK);b(6.36,2.04,.04,.04,1.6,BK);b(6.36,2.68,.06,.06,1.6,BK);b(5.7,2.2,.08,.08,.04,BK,2.1);
+b(3.69,1.6,.12,.9,.04,OAK);b(4.52,1.78,.92,.96,.04,0xaab8bf);gl(4.5,1.72,.94,.04,1.6);gl(4.46,1.75,.04,.99,1.6);b(4.44,1.72,.06,.06,1.6,BK);b(4.44,2.05,.04,.04,1.6,BK);b(4.44,2.7,.06,.06,1.6,BK);b(5.3,2.2,.08,.08,.04,BK,2.1);
+// living
+b(5.5,4.1,2.6,2.6,.02,0xe9e5dc);
+b(7.4,4.3,.85,2.2,.4,GR);b(8.1,4.3,.15,2.2,.85,GR);b(7.4,4.3,.85,.15,.6,GR);b(7.4,6.35,.85,.15,.6,GR);b(7.55,4.6,.5,.7,.12,WH,.4);b(7.55,5.5,.5,.7,.12,SG,.4);
+b(6.3,4.9,.6,1,.35,OAK);b(5.02,4.6,.35,1.6,.4,OAK);b(5.02,4.9,.05,1,.6,BK,.9);
+plant(5.2,3.2,1.1);
+// dining
+b(7.3,.55,.8,1.6,.05,OAK,.72);b(7.35,.6,.06,.06,.72,OAK);b(7.99,.6,.06,.06,.72,OAK);b(7.35,2.04,.06,.06,.72,OAK);b(7.99,2.04,.06,.06,.72,OAK);
+[[8.15,.55],[8.15,1.1],[8.15,1.65],[7.5,.1],[7.5,2.2]].forEach(p=>b(p[0],p[1],.42,.42,.45,WH));
+const lp=new THREE.Mesh(new THREE.CylinderGeometry(.1,.3,.25,16),M(OAK));lp.position.set(7.7,1.9,1.35);G.add(lp);
+b(7.69,1.34,.03,.03,.55,BK,2.03);
+// kitchen
+b(8.3,3.9,1.7,3,.03,0xd9dde0);b(9.4,5.4,.6,1.5,.9,OAK);b(9.4,5.4,.6,1.5,.04,WH,.9);b(9.5,5.55,.4,.6,.02,BK,.94);b(9.5,6.3,.4,.5,.02,GR,.94);
+b(9.4,4,.6,.7,1.8,0x4a4e52);b(9.37,4.15,.03,.04,.5,0xc8c8c8,.9);b(9.37,4.55,.03,.04,.5,0xc8c8c8,.9);b(9.4,3.95,.6,.75,.7,0xd6d2cc,1.85);
+b(9.92,4.7,.08,.7,2.55,0xece8e2);b(9.4,4.7,.6,.03,2.55,WH);b(9.4,5.37,.6,.03,2.55,WH);
+[.35,.8,1.25,1.7,2.15].forEach((y,i)=>{b(9.4,4.7,.55,.7,.03,WH,y);b(9.55,4.78,.18,.2,.22,[0xb88a5a,0x8a5a3a,0xd9c7a8,0x6f8f6f,0xc9a27a][i],y+.03);b(9.55,5.05,.18,.2,.22,[0xd9c7a8,0xb88a5a,0x6f8f6f,0x8a5a3a,0xe8e0d0][i],y+.03)});
+b(9.45,5.5,.5,.7,.3,GR,1.7);b(9.62,5.7,.16,.16,.6,GR,2.0);rgl(8.28,3.9,.05,3,2.6);rgl(9.2,3.88,.8,.05,2.6);rgl(8.35,3.86,.81,.04,2.4);b(8.35,3.84,.81,.06,.05,WH,2.4);b(8.35,3.84,.81,.06,.04,WH,0);b(8.26,3.86,.09,.09,2.6,WH);b(9.16,3.86,.09,.09,2.6,WH);b(8.26,3.9,.06,3,.04,WH,2.56);
+// balcony
+b(8.1,6.95,.65,.65,.9,WH);const wd=new THREE.Mesh(new THREE.CylinderGeometry(.2,.2,.04,24),M(0x59656b));wd.rotation.x=Math.PI/2;wd.position.set(8.425,.45,7.62);G.add(wd);
+b(5.5,7.98,.04,.04,1.9,BK);b(7.9,7.98,.04,.04,1.9,BK);b(5.5,7.98,2.44,.03,.03,GR,1.85);
+for(let i=0;i<9;i++)b(5.65+i*.25,7.81,.04,.34,.75,[WH,GR,0xd9c7a8,0x9db7a2,0xb8a89a][i%5],1.08);plant(8.4,8.4,1.3);plant(8.4,7.2,.9);
+// labels
+const labels=new THREE.Group();sc.add(labels);
+const tagEl=document.getElementById('tags'),tagList=[];
+function lab(t,x,z){const d=document.createElement('div');d.className='tag';d.textContent=t+' ›';tagEl.appendChild(d);tagList.push({d,v:new THREE.Vector3(x,1.7,z)})}
+function place(){tagList.forEach(o=>{const p=o.v.clone().project(cam);o.d.style.left=((p.x+1)/2*innerWidth)+'px';o.d.style.top=((1-p.y)/2*innerHeight)+'px';o.d.style.display=p.z<1?'block':'none'})}
+function labOld(t,x,z){const k=document.createElement('canvas');k.width=256;k.height=96;const g=k.getContext('2d');
+g.font='bold 42px sans-serif';g.textAlign='center';g.textBaseline='middle';g.lineWidth=8;g.strokeStyle='rgba(255,255,255,.9)';g.strokeText(t,128,48);g.fillStyle='#2f3236';g.fillText(t,128,48);
+const m=new THREE.Mesh(new THREE.PlaneGeometry(1.6,.6),new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(k),transparent:true}));
+m.rotation.x=-Math.PI/2;m.position.set(x,.05,z);labels.add(m)}
+lab('主臥',1.9,2.4);lab('次臥',1.25,3.4);lab('客房＋書桌',3.9,5.55);lab('主臥浴室',4.6,2.2);lab('公共衛浴',6.3,2.2);
+lab('客廳',6.4,6.55);lab('餐廳',7.7,1.35);lab('廚房',8.85,5.6);lab('陽台',6.5,8.45);lab('洗衣機',8.4,7.3);lab('曬衣區',6.7,8.0);lab('玄關',8.6,-2.6);lab('收納牆',9.8,.5);lab('大門',8.8,-4.1);lab('冰箱',9.7,4.35);lab('廚房收納',9.7,5.05);
+// camera
+let auto=true,th=0,ph=.9,rad=16;const tg=new THREE.Vector3(5,0,2.6);let dirty=true;
+const req=()=>{dirty=true};
+function fit(){return Math.min(45,Math.max(17,11.5/(.728*cam.aspect)))}
+function upd(){cam.position.set(tg.x+rad*Math.sin(ph)*Math.sin(th),rad*Math.cos(ph),tg.z+rad*Math.sin(ph)*Math.cos(th));cam.lookAt(tg);req()}
+function rs(){r.setPixelRatio(Math.min(devicePixelRatio,2));r.setSize(innerWidth,innerHeight);cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix();rad=fit()*(ph<.3?1:.92);upd()}
+addEventListener('resize',rs);
+const bg=()=>{sc.background=new THREE.Color(getComputedStyle(document.body).backgroundColor);req()};
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>setTimeout(bg,50));
+const pts=new Map();let pd=0;
+cv.addEventListener('pointerdown',e=>{auto=false;$('b5').classList.remove('on');cv.setPointerCapture(e.pointerId);pts.set(e.pointerId,e)});
+cv.addEventListener('pointerup',e=>{pts.delete(e.pointerId);pd=0});
+cv.addEventListener('pointermove',e=>{const p=pts.get(e.pointerId);if(!p)return;
+if(pts.size===1){th-=(e.clientX-p.clientX)*.008;ph=Math.min(1.45,Math.max(.05,ph-(e.clientY-p.clientY)*.006))}
+else if(pts.size===2){pts.set(e.pointerId,e);const a=[...pts.values()],d=Math.hypot(a[0].clientX-a[1].clientX,a[0].clientY-a[1].clientY);if(pd)rad=Math.min(45,Math.max(4,rad*pd/d));pd=d}
+pts.set(e.pointerId,e);upd()});
+cv.addEventListener('wheel',e=>{e.preventDefault();rad=Math.min(45,Math.max(4,rad*(1+e.deltaY*.001)));upd()},{passive:false});
+const $=i=>document.getElementById(i);
+$('b1').onclick=()=>{auto=false;$('b5').classList.remove('on');th=0;ph=.05;rad=fit();upd()};
+$('b2').onclick=()=>{auto=false;$('b5').classList.remove('on');th=-.35;ph=.9;rad=fit()*.92;upd()};
+$('b3').onclick=e=>{const full=WH_<2;setH(full?2.6:.9);e.target.textContent=full?'全高牆':'矮牆';e.target.classList.toggle('on',!full);req()};
+$('b4').onclick=e=>{labels.visible=!labels.visible;tagEl.style.display=labels.visible?'block':'none';e.target.classList.toggle('on',labels.visible);req()};
+$('b5').onclick=e=>{auto=!auto;e.target.classList.toggle('on',auto)};
+bg();rs();
+(function loop(){requestAnimationFrame(loop);if(auto){th+=.004;upd()}if(dirty){dirty=false;r.render(sc,cam);place()}})();
+</script></body></html>
